@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BrainTrainer compose</string>
+    <string name="score_board">Результаты</string>
+    <string name="just_do_it">Сделаем это!</string>
+    <string name="settings">Настройки</string>
+    <string name="game">Игра</string>
+    <string name="game_settings">Настройки игры</string>
+    <string name="difficulty">Сложность</string>
+    <string name="easy">Легко</string>
+    <string name="normal">Средне</string>
+    <string name="hard">Трудно</string>
+    <string name="impossible">Невозможно</string>
+    <string name="game_on_time">Игра на время</string>
+    <string name="count_down">Обратный отсчет</string>
+    <string name="score_count">Подсчет очков</string>
+    <string name="save">Сохранить</string>
+    <string name="game_result">Результаты игры</string>
+    <string name="score">Очки</string>
+    <string name="time">Время</string>
+    <string name="app_theme">Выбор темы</string>
+    <string name="share_app">Поделиться</string>
+    <string name="empty_games_results">Вы еще ни разу не играли.\nКак же так?</string>
+    <string name="try_now">Сделаем это!</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="nick_name">Имя</string>
+    <string name="expression_type">Тип примеров</string>
+    <string name="select_difficulty">Выберете сложность</string>
+    <string name="addition">Сложение</string>
+    <string name="subtraction">Вычитаение</string>
+    <string name="multiplication">Умножение</string>
+    <string name="division">Деление</string>
+    <string name="select_expression">Выберите тип</string>
+</resources>
