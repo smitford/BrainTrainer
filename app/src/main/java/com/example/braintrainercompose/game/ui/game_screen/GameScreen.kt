@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,8 +26,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,17 +43,15 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.braintrainercompose.R
-import com.example.braintrainercompose.game.di.gameModule
 import com.example.braintrainercompose.game.domain.models.GameResults
 import com.example.braintrainercompose.game.domain.models.GameSettings
 import com.example.braintrainercompose.game.domain.models.MathExpression
@@ -60,10 +59,7 @@ import com.example.braintrainercompose.game.ui.models.ExtraWindowStatus
 import com.example.braintrainercompose.game.ui.models.GameProgress
 import com.example.braintrainercompose.game.ui.view_model.GameViewModel
 import com.example.braintrainercompose.utils.getExpression
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.KoinApplication
-import org.koin.core.annotation.KoinExperimentalAPI
 
 @Composable
 fun GameScreen(viewModel: GameViewModel = koinViewModel()) {
@@ -215,22 +211,31 @@ fun TableElement(
 ) {
     if (showAnswer) focusManager.clearFocus()
     Row(
-        verticalAlignment = Alignment.Bottom,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
-        Text(text = getExpression(expression, expressionSymbol))
-        OutlinedTextField(
+        Text(
+            text = getExpression(expression, expressionSymbol),
+            style = TextStyle(color = MaterialTheme.colorScheme.primary)
+        )
+        BasicTextField(
             value = enteredResult,
-            modifier = Modifier
-                .size(width = 50.dp, height = 50.dp)
-                .focusable(enabled = !showAnswer),
-            onValueChange = {
-                editText(it, expression.id)
+            onValueChange = { newText ->
+                editText(newText, expression.id)
             },
+            modifier = Modifier
+                .size(width = 36.dp, height = 26.dp)
+                .focusable(enabled = !showAnswer),
+            textStyle = LocalTextStyle.current.merge(
+                TextStyle(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
+                )
+            ),
             singleLine = true,
             maxLines = 1,
-            textStyle = TextStyle(color = Color.Black, fontSize = 12.sp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             keyboardActions = KeyboardActions(),
             readOnly = showAnswer
@@ -261,7 +266,7 @@ fun ExtraWindow(modifier: Modifier, objectives: @Composable () -> Unit) {
         modifier = modifier
     ) { objectives() }
 }
-
+/*
 @OptIn(KoinExperimentalAPI::class)
 @Preview(showBackground = true)
 @Composable
@@ -275,6 +280,7 @@ fun GreetingPreview() {
     }
 
 }
+*/
 
 
 
