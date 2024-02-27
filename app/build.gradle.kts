@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.braintrainercompose"
+    namespace = "main.work.braintrainercompose"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.braintrainercompose"
+        applicationId = "main.work.braintrainercompose"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

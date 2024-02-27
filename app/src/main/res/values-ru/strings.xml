@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">BrainTrainer compose</string>
     <string name="score_board">Результаты</string>
-    <string name="just_do_it">Сделаем это!</string>
+    <string name="start">Старт</string>
+    <string name="pause">Пауза</string>
     <string name="settings">Настройки</string>
     <string name="game">Игра</string>
     <string name="game_settings">Настройки игры</string>
@@ -31,4 +32,9 @@
     <string name="multiplication">Умножение</string>
     <string name="division">Деление</string>
     <string name="select_expression">Выберите тип</string>
+    <string name="save_results_warning">Поле имя пустое, попробуйте еще раз.</string>
+    <string name="close_results_warning">Вы уверены, что не хотите сохранить результат?</string>
+    <string name="yes">Да</string>
+    <string name="no_save">Нет, сохранить</string>
+    <string name="warning">Внимание!</string>
 </resources>
