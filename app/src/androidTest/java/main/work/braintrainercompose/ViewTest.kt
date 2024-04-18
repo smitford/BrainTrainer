@@ -17,9 +17,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.braintrainercompose.scores.domain.models.SessionHistory
-import com.example.braintrainercompose.scores.ui.score_board.History
-import com.example.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
+import main.work.braintrainercompose.scores.domain.models.SessionHistory
+import main.work.braintrainercompose.scores.ui.score_board.History
+import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
 
 @Composable
 fun ScoreBoardTest(sessionHistoryList: List<SessionHistory>) {

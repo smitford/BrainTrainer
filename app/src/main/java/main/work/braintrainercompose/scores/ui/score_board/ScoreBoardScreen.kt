@@ -110,19 +110,35 @@ fun TableElement(tableElement: SessionHistory?, elementIndex: Int, modifier: Mod
         }
         else TableTitleElement.entries.forEach { element ->
             when (element) {
-                TableTitleElement.DIFFICULTY -> TableElementText(text = tableElement.difficulty)
-                TableTitleElement.NICK_NAME -> TableElementText(text = tableElement.userName)
-                TableTitleElement.NUMBER -> TableElementText(text = elementIndex.toString())
-                TableTitleElement.SCORE -> TableElementText(text = tableElement.score)
+                TableTitleElement.DIFFICULTY -> TableElementText(
+                    text = tableElement.difficulty,
+                    modifier = Modifier
+                )
+
+                TableTitleElement.NICK_NAME -> TableElementText(
+                    text = tableElement.userName,
+                    modifier = Modifier
+                )
+
+                TableTitleElement.NUMBER -> TableElementText(
+                    text = elementIndex.toString(),
+                    modifier = Modifier
+                )
+
+                TableTitleElement.SCORE -> TableElementText(
+                    text = tableElement.score,
+                    modifier = Modifier
+                )
             }
         }
     }
 }
 
 @Composable
-fun TableElementText(text: String) {
+fun TableElementText(text: String, modifier: Modifier) {
     Text(
         text = text,
+        modifier = modifier,
         textAlign = TextAlign.Start,
         style = TextStyle(MaterialTheme.colorScheme.tertiary).merge(
             MaterialTheme.typography.bodyMedium

@@ -1,6 +1,7 @@
 package main.work.braintrainercompose.game.di
 
 import android.app.Application
+import android.content.SharedPreferences
 import com.google.gson.Gson
 import main.work.braintrainercompose.game.data.GameSessionAdapter
 import main.work.braintrainercompose.game.data.expression.ExpressionGeneratorRepoImpl
@@ -39,17 +40,19 @@ val gameModule = module {
     factory<GetExpression> {
         GetExpressionUseCase(expressionGenerator = get())
     }
-    viewModel {
+    viewModel {parameters->
         GameViewModel(
             expressionGetter = get(),
             settingsInteractor = get(),
             timeGetter = get(),
             resultsCounter = get(),
-            resultSaver = get()
+            resultSaver = get(),
+            bottomBarSynchronizer = parameters.get()
         )
     }
+
     single { Gson() }
-    single {
+    single<SharedPreferences> {
         androidContext().getSharedPreferences(
             APP_SETTINGS, Application.MODE_PRIVATE
         )

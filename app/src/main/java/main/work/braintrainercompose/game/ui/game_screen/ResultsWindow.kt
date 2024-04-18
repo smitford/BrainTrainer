@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,8 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -41,7 +39,6 @@ import main.work.braintrainercompose.R
 import main.work.braintrainercompose.game.domain.models.GameResults
 import main.work.braintrainercompose.utils.getDoubleDotsString
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultsWindow(
     resultOfGame: GameResults,
@@ -56,19 +53,20 @@ fun ResultsWindow(
         openDialog ->
             CloseWindowConformationDialog(
                 onDismissRequest = {
-                    saveIconClicked()
+                    closeIconClicked()
                     openDialog = false
                 },
                 onConfirmation = {
-                    closeIconClicked()
+                    saveIconClicked()
                     openDialog = false
                 },
                 dialogTitle = stringResource(id = R.string.warning),
                 dialogText = stringResource(id = R.string.close_results_warning),
-                dismissButtonText = stringResource(id = R.string.no_save),
-                confirmButtonText = stringResource(id = R.string.save)
+                dismissButtonText = stringResource(id = R.string.yes),
+                confirmButtonText = stringResource(id = R.string.no_save)
             )
     }
+
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,10 +85,10 @@ fun ResultsWindow(
                 modifier = Modifier
                     .padding(12.dp)
                     .clickable {
-                        if (name.isNotEmpty()) {
-                            openDialog = true
-                        } else {
+                        if (name.isEmpty()) {
                             closeIconClicked()
+                        } else {
+                            openDialog = true
                         }
                     }
                     .align(Alignment.End),
@@ -110,7 +108,7 @@ fun ResultsWindow(
             singleLine = true,
             onValueChange = { nameChanged(it) },
             modifier = Modifier
-                .focusRequester(focusRequester = FocusRequester.Default)
+                // .focusRequester(focusRequester = FocusRequester.Default)
                 .fillMaxWidth()
                 .padding(horizontal = 52.dp, vertical = 28.dp)
                 .background(
@@ -167,7 +165,9 @@ fun ResultsWindow(
         }
 
         OutlinedButton(
-            modifier = Modifier.padding(vertical = 20.dp),
+            modifier = Modifier
+                .padding(vertical = 20.dp)
+                .imePadding(),
             onClick = {
                 saveIconClicked()
             }, colors = ButtonDefaults
@@ -190,19 +190,21 @@ fun CloseWindowConformationDialog(
     onConfirmation: () -> Unit,
     dialogTitle: String,
     dialogText: String,
-    dismissButtonText:String,
+    dismissButtonText: String,
     confirmButtonText: String
 ) {
     AlertDialog(
         onDismissRequest = { onDismissRequest() },
-        confirmButton = { TextButton(onClick = { onConfirmation() }) {
-            Text(text = confirmButtonText)
-        } },
+        confirmButton = {
+            TextButton(onClick = { onConfirmation() }) {
+                Text(text = confirmButtonText)
+            }
+        },
         title = { Text(text = dialogTitle) },
         text = { Text(text = dialogText) },
         dismissButton = {
             TextButton(onClick = { onDismissRequest() }) {
-                Text(text =dismissButtonText )
+                Text(text = dismissButtonText)
             }
         }
     )

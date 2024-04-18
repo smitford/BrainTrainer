@@ -11,7 +11,7 @@
     <string name="easy">Легко</string>
     <string name="normal">Средне</string>
     <string name="hard">Трудно</string>
-    <string name="impossible">Невозможно</string>
+    <string name="impossible">Очень трудно</string>
     <string name="game_on_time">Игра на время</string>
     <string name="count_down">Обратный отсчет</string>
     <string name="score_count">Подсчет очков</string>
@@ -28,13 +28,15 @@
     <string name="expression_type">Тип примеров</string>
     <string name="select_difficulty">Выберете сложность</string>
     <string name="addition">Сложение</string>
-    <string name="subtraction">Вычитаение</string>
+    <string name="subtraction">Вычитание</string>
     <string name="multiplication">Умножение</string>
     <string name="division">Деление</string>
     <string name="select_expression">Выберите тип</string>
-    <string name="save_results_warning">Поле имя пустое, попробуйте еще раз.</string>
-    <string name="close_results_warning">Вы уверены, что не хотите сохранить результат?</string>
+    <string name="save_results_warning">Поле "Имя" пустое, попробуйте еще раз.</string>
+    <string name="close_results_warning">Вы уверены, что не хотите сохранить результаты?</string>
     <string name="yes">Да</string>
     <string name="no_save">Нет, сохранить</string>
     <string name="warning">Внимание!</string>
+    <string name="theme">Темная тема</string>
+    <string name="privacy_policy">Политика конфеденциальности</string>
 </resources>

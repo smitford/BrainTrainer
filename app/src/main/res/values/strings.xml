@@ -36,6 +36,8 @@
     <string name="save_results_warning">Name field is empty, try again.</string>
     <string name="close_results_warning">Are you sure you don\'t want to save the result?</string>
     <string name="yes">Yes</string>
-    <string name="no_save">No, save result</string>
+    <string name="no_save">No, save</string>
     <string name="warning">Warning!</string>
+    <string name="theme">Dark theme</string>
+    <string name="privacy_policy">Privacy policy</string>
 </resources>

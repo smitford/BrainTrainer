@@ -28,7 +28,8 @@ class GameViewModel(
     private val settingsInteractor: SettingsInteractor,
     private val timeGetter: GetTime,
     private val resultsCounter: ResultsCounterUseCase,
-    private val resultSaver: ResultSaverUseCase
+    private val resultSaver: ResultSaverUseCase,
+    private val bottomBarSynchronizer: (GameProgress) -> Unit
 ) : ViewModel() {
     private var gameState = MutableLiveData(GameState())
     private val answersList = mutableStateMapOf<Int, String>()
@@ -41,8 +42,13 @@ class GameViewModel(
         useLastParam = true
     ) { showAnswer() }
 
+    init {
+        getSettings()
+    }
+
     override fun onCleared() {
         super.onCleared()
+        timerJob?.cancel()
         timerJob = null
     }
 
@@ -72,6 +78,7 @@ class GameViewModel(
                 gamesProgress = GameProgress.STOPPED,
                 gameResults = results
             )
+        bottomBarSynchronizer(GameProgress.STOPPED)
     }
 
     private fun defaultValue() {
@@ -90,12 +97,16 @@ class GameViewModel(
 
     fun getExpression() {
         defaultValue()
+        if (gameState.value?.settings?.countDown == true)
+            currentTimer =
+                (gameState.value?.settings!!.difficulty.time * gameState.value?.settings!!.difficulty.count).toLong() * 1000
         expressions =
             expressionGetter.execute(gameSettings = gameState.value?.settings ?: GameSettings())
         gameState.value = getCurrentStatus().copy(
             expression = expressions,
             gamesProgress = GameProgress.IN_PROGRESS
         )
+        bottomBarSynchronizer(GameProgress.IN_PROGRESS)
     }
 
     fun saveGameSettings(settings: GameSettings) {
@@ -105,8 +116,6 @@ class GameViewModel(
     fun getSettings() {
         val settings = settingsInteractor.getSettings()
         defaultValue()
-        if (settings.countDown)
-            currentTimer = (settings.difficulty.time * settings.difficulty.count).toLong() * 1000
         gameState.value = getCurrentStatus().copy(settings = settings)
     }
 
@@ -127,6 +136,7 @@ class GameViewModel(
                             gamesProgress = GameProgress.STOPPED,
                             gameResults = results
                         )
+                    bottomBarSynchronizer(GameProgress.STOPPED)
                 }
 
                 gameState.value =
@@ -148,11 +158,13 @@ class GameViewModel(
 
     fun pauseGame() {
         gameState.value = getCurrentStatus().copy(gamesProgress = GameProgress.PAUSED)
+        bottomBarSynchronizer(GameProgress.PAUSED)
     }
 
     fun continueGame() {
         gameState.value = getCurrentStatus().copy(gamesProgress = GameProgress.IN_PROGRESS)
         timerRefresher()
+        bottomBarSynchronizer(GameProgress.IN_PROGRESS)
     }
 
     fun saveResults(name: String) {
@@ -163,6 +175,10 @@ class GameViewModel(
                 difficulty = gameState.value?.settings?.difficulty?.name ?: " "
             )
         }
+        saveMode()
+    }
+
+    fun saveMode() {
         gameState.value = getCurrentStatus().copy(gamesProgress = GameProgress.SAVED)
     }
 

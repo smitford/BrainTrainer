@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,19 +51,19 @@ fun GameSettings(
     baseGameSettings: GameSettings,
     closeIconClicked: (GameSettings) -> Unit
 ) {
-    var difficultyInChange by remember {
+    var difficultyInChange by rememberSaveable {
         mutableStateOf(baseGameSettings.difficulty)
     }
-    var timeGameInChange by remember {
+    var timeGameInChange by rememberSaveable {
         mutableStateOf(baseGameSettings.timeGame)
     }
-    var countDownInChange by remember {
+    var countDownInChange by rememberSaveable {
         mutableStateOf(baseGameSettings.countDown)
     }
-    var scoreCountInChange by remember {
+    var scoreCountInChange by rememberSaveable {
         mutableStateOf(baseGameSettings.scoreCount)
     }
-    var expressionTypeInChange by remember {
+    var expressionTypeInChange by rememberSaveable {
         mutableStateOf(baseGameSettings.expressionType)
     }
     Column(
@@ -212,7 +213,13 @@ fun GameSettingsSegment(
                 name = stringResource(id = expressionType.id)
             )
 
-            SettingsMenuElement.COUNTDOWN -> BaseSwitcher(
+            SettingsMenuElement.GAME_TYPE -> BaseSwitcher(
+                stateBase = timeGame,
+                menuElement = element,
+                onCheckedChanged = onCheckedChanged
+            )
+
+            SettingsMenuElement.COUNTDOWN -> if (timeGame) BaseSwitcher(
                 stateBase = countDown,
                 menuElement = element,
                 onCheckedChanged = onCheckedChanged
@@ -220,12 +227,6 @@ fun GameSettingsSegment(
 
             SettingsMenuElement.SCORE_COUNT -> BaseSwitcher(
                 stateBase = scoresCount,
-                menuElement = element,
-                onCheckedChanged = onCheckedChanged
-            )
-
-            SettingsMenuElement.GAME_TYPE -> BaseSwitcher(
-                stateBase = timeGame,
                 menuElement = element,
                 onCheckedChanged = onCheckedChanged
             )
