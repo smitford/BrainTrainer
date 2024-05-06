@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BrainTrainer compose</string>
+    <string name="app_name" translatable="false">BrainTrainer</string>
     <string name="score_board">Scoreboard</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>

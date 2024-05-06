@@ -1,6 +1,6 @@
 package main.work.braintrainercompose.settings.ui.screen
 
-import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
@@ -18,10 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -29,18 +27,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import main.work.braintrainercompose.R
+import main.work.braintrainercompose.settings.ui.view_model.SettingsViewModel
 import main.work.braintrainercompose.utils.DataUtils.Companion.WEB_SCREEN_ROUT
-import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun Settings(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController = NavHostController(LocalContext.current)
+    navHostController: NavHostController = NavHostController(LocalContext.current),
+    viewModel: SettingsViewModel = koinViewModel(),
+    changeTheme: (Boolean) -> Unit
 ) {
+    val themeState = viewModel.getTheme().observeAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +65,13 @@ fun Settings(
                 )
             )
         }
-        DarkThemeSwitcher(modifier)
+        DarkThemeSwitcher(
+            modifier,
+            isDarkTheme = themeState.value ?: isSystemInDarkTheme()
+        ) { switch ->
+            viewModel.saveTheme(switch)
+            changeTheme(switch)
+        }
         Share(modifier = modifier) {}
         PrivacyPolicy(modifier = modifier) {
             navHostController.navigate(route = WEB_SCREEN_ROUT)
@@ -71,10 +80,11 @@ fun Settings(
 }
 
 @Composable
-fun DarkThemeSwitcher(modifier: Modifier, isDarkTheme: Boolean = false) {
-    var themeFlag by rememberSaveable {
-        mutableStateOf(isDarkTheme)
-    }
+fun DarkThemeSwitcher(
+    modifier: Modifier,
+    isDarkTheme: Boolean,
+    switchChanged: (Boolean) -> Unit
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -82,12 +92,8 @@ fun DarkThemeSwitcher(modifier: Modifier, isDarkTheme: Boolean = false) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(id = R.string.theme),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Switch(checked = themeFlag, onCheckedChange = { themeFlag = !themeFlag })
+        SettingsText(modifier = modifier, text = R.string.theme)
+        Switch(checked = isDarkTheme, onCheckedChange = { data -> switchChanged(data) })
     }
 
 }
@@ -101,11 +107,7 @@ fun Share(modifier: Modifier, shareButtonClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(id = R.string.share_app),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
+        SettingsText(modifier = modifier, text = R.string.share_app)
         IconButton(onClick = { shareButtonClick() }) {
             Icon(
                 imageVector = Icons.Filled.Share,
@@ -125,28 +127,37 @@ fun PrivacyPolicy(modifier: Modifier, showPolicy: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(id = R.string.privacy_policy),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
+        SettingsText(modifier = modifier, text = R.string.privacy_policy)
         IconButton(onClick = { showPolicy() }) {
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = "share_icon",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = modifier.size(25.dp)
             )
         }
     }
 }
 
-@Preview(
+@Composable
+fun SettingsText(text: Int, modifier: Modifier) {
+    Text(
+        text = stringResource(text),
+        style = MaterialTheme.typography.headlineLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.fillMaxWidth(0.7f),
+        letterSpacing = 0.5.sp
+    )
+}
+
+/*@Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+)*/
+/*
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     BrainTrainerComposeTheme {
-        Settings()
+        Settings() {}
     }
-}
+}*/

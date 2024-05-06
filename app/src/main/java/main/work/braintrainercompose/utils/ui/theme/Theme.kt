@@ -77,10 +77,16 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun BrainTrainerComposeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    settingsFromSharedPref: Boolean = false,
+    checkShared: () -> Unit,
     content: @Composable () -> Unit
 ) {
+    val systemTheme = if (settingsFromSharedPref) darkTheme else {
+        checkShared()
+        isSystemInDarkTheme()
+    }
     val colorScheme = when {
-        darkTheme || isSystemInDarkTheme() -> DarkColorScheme
+        systemTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
@@ -88,7 +94,8 @@ fun BrainTrainerComposeTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                systemTheme
         }
     }
 

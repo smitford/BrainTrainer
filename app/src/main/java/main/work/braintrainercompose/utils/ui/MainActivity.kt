@@ -2,7 +2,6 @@ package main.work.braintrainercompose.utils.ui
 
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -25,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import main.work.braintrainercompose.game.ui.game_screen.GameScreen
 import main.work.braintrainercompose.game.ui.models.GameProgress
@@ -51,11 +50,15 @@ class MainActivity : ComponentActivity() {
             DataUtils.APP_SETTINGS,
             Application.MODE_PRIVATE
         )
-        val isDarkTheme = sharedPref.getBoolean(THEME_SETTINGS, false)
+        var containsThemeSettings by mutableStateOf(sharedPref.contains(THEME_SETTINGS))
+        var isDarkTheme by mutableStateOf(sharedPref.getBoolean(THEME_SETTINGS, false))
 
         setContent {
-            BrainTrainerComposeTheme(darkTheme = isDarkTheme) {
-                MainApp()
+            BrainTrainerComposeTheme(
+                darkTheme = isDarkTheme,
+                containsThemeSettings,
+                checkShared = { containsThemeSettings = sharedPref.contains(THEME_SETTINGS) }) {
+                MainApp() { data -> isDarkTheme = data }
             }
         }
     }
@@ -63,8 +66,9 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainApp() {
+fun MainApp(changeTheme: (Boolean) -> Unit) {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -81,7 +85,7 @@ fun MainApp() {
         modifier = Modifier,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
-            when (currentRoute(navController)) {
+            when (navBackStackEntry?.destination?.route) {
                 WEB_SCREEN_ROUT -> {}
                 else -> AnimatedVisibility(
                     visible = bottomBarVisibility,
@@ -114,7 +118,6 @@ fun MainApp() {
                         bottomBarState = changeStateBaseOnGameProgress(
                             gameProgress
                         )
-                        Log.d("Bottom Bar", bottomBarState.toString())
                     },
                     snackBarHostState = snackbarHostState,
                     scope = scope,
@@ -126,10 +129,10 @@ fun MainApp() {
                 }
             }
             composable(BottomNavItems.Settings.title) {
-                Settings(navHostController = navController)
+                Settings(navHostController = navController, changeTheme = changeTheme)
             }
-            composable(route = "Web View") {
-                WebViewScreen()
+            composable(route = WEB_SCREEN_ROUT) {
+                WebViewScreen(navHostController = navController)
             }
         }
     }
@@ -146,15 +149,10 @@ fun changeStateBaseOnGameProgress(
         else -> BottomBarState.PAUSE_ICON
     }
 
-@Composable
-fun currentRoute(navController: NavController): String? {
-    return navController.currentDestination?.route
-}
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    BrainTrainerComposeTheme(false) {
-        MainApp()
+    BrainTrainerComposeTheme(false, checkShared = {}) {
+        MainApp() {}
     }
 }

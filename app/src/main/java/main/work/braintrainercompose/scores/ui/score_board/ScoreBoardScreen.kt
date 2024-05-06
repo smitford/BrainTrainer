@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -49,14 +48,15 @@ fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHo
                 .padding(top = dimensionResource(id = R.dimen.padding_16)), shape = RectangleShape
         ) {
             Text(
-                text = stringResource(id = R.string.score_board), modifier = Modifier.padding(
+                text = stringResource(id = R.string.score_board),
+                modifier = Modifier.padding(
                     start = dimensionResource(id = R.dimen.padding_16),
-                ), style = TextStyle(MaterialTheme.colorScheme.primary).merge(
-                    MaterialTheme.typography.titleLarge
-                )
+                ),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
             )
         }
-        if (status.value?.isEmpty == true) EmptyHistory { navHostController.navigate(route = "Play") }
+        if (status.value?.isEmpty == true) EmptyHistory { navHostController.popBackStack() }
         else status.value!!.sessionHistoryList?.let { History(sessionHistoryList = it) { viewModel.clearHistory() } }
     }
 
@@ -97,37 +97,35 @@ fun History(sessionHistoryList: List<SessionHistory>, historyEvent: () -> Unit) 
 @Composable
 fun TableElement(tableElement: SessionHistory?, elementIndex: Int, modifier: Modifier) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier
+        horizontalArrangement = Arrangement.Absolute.SpaceBetween, modifier =
+        modifier.padding(horizontal = 5.dp, vertical = 2.dp)
     ) {
         if (tableElement == null) TableTitleElement.entries.forEach { element ->
-            Text(
+            TableElementText(
                 text = stringResource(id = element.textId),
-                textAlign = TextAlign.Center,
-                style = TextStyle(MaterialTheme.colorScheme.primary).merge(
-                    MaterialTheme.typography.headlineLarge
-                )
+                modifier = Modifier.fillMaxWidth(element.weight)
             )
         }
         else TableTitleElement.entries.forEach { element ->
             when (element) {
                 TableTitleElement.DIFFICULTY -> TableElementText(
                     text = tableElement.difficulty,
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth(0.35f)
                 )
 
                 TableTitleElement.NICK_NAME -> TableElementText(
                     text = tableElement.userName,
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth(0.35f)
                 )
 
                 TableTitleElement.NUMBER -> TableElementText(
                     text = elementIndex.toString(),
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth(0.05f)
                 )
 
                 TableTitleElement.SCORE -> TableElementText(
                     text = tableElement.score,
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth(0.25f)
                 )
             }
         }
@@ -139,10 +137,9 @@ fun TableElementText(text: String, modifier: Modifier) {
     Text(
         text = text,
         modifier = modifier,
-        textAlign = TextAlign.Start,
-        style = TextStyle(MaterialTheme.colorScheme.tertiary).merge(
-            MaterialTheme.typography.bodyMedium
-        )
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.tertiary
     )
 }
 
@@ -160,9 +157,8 @@ fun EmptyHistory(emptyHistoryEvent: () -> Unit) {
             modifier = Modifier.padding(vertical = 12.dp),
             text = stringResource(id = R.string.empty_games_results),
             textAlign = TextAlign.Center,
-            style = TextStyle(MaterialTheme.colorScheme.primary).merge(
-                MaterialTheme.typography.headlineLarge
-            )
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
         )
         ButtonTemplate(textId = R.string.try_now, emptyHistoryEvent)
     }
@@ -173,9 +169,8 @@ fun ButtonTemplate(textId: Int, onClickEvent: () -> Unit) {
     Button(onClick = { onClickEvent() }, modifier = Modifier.padding(vertical = 12.dp)) {
         Text(
             text = stringResource(id = textId),
-            style = TextStyle(MaterialTheme.colorScheme.onPrimary).merge(
-                MaterialTheme.typography.headlineLarge
-            )
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

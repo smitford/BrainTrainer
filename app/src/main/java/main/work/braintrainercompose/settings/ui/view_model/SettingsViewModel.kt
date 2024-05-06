@@ -1,5 +1,7 @@
 package main.work.braintrainercompose.settings.ui.view_model
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import main.work.braintrainercompose.settings.domain.ThemeGetterUseCase
 import main.work.braintrainercompose.settings.domain.ThemeSaverUseCase
@@ -11,11 +13,20 @@ class SettingsViewModel(
     private val urlSenderUseCase: UrlSenderUseCase
 ) :
     ViewModel() {
-    fun getTheme(): Boolean = themeGetterUseCase.execute()
+    private val theme = MutableLiveData<Boolean>()
+
+    init {
+        theme.value = loadTheme()
+    }
+
+    fun getTheme(): LiveData<Boolean> = theme
 
     fun saveTheme(isDarkTheme: Boolean) {
         themeSaverUseCase.execute(isDarkTheme = isDarkTheme)
+        theme.value = loadTheme()
     }
+
+    private fun loadTheme(): Boolean? = themeGetterUseCase.execute()
 
     fun shareApp() {
         urlSenderUseCase.execute(url = "")

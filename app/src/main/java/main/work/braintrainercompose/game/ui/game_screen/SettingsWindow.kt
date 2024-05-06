@@ -337,7 +337,7 @@ fun MenuContent(
 @Preview(showBackground = true)
 @Composable
 fun SettingsPreview() {
-    BrainTrainerComposeTheme {
+    BrainTrainerComposeTheme(checkShared = {}) {
         GameSettings(GameSettings()) {}
     }
 }

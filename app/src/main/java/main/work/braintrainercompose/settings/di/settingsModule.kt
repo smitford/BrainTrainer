@@ -16,10 +16,15 @@ import org.koin.dsl.module
 
 val settingsModule = module {
     single<DataSenderRepo> { DataSenderRepoImp(context = get()) }
+
     single<ThemeRepo> { ThemeRepoImp(sharedPref = get()) }
+
     factory<ThemeGetterUseCase> { SharedPrefThemeGetter(repository = get()) }
+
     factory<ThemeSaverUseCase> { SharedPrefThemeSaver(repository = get()) }
+
     factory<UrlSenderUseCase> { UrlSenderImp(repository = get()) }
+
     viewModel {
         SettingsViewModel(
             themeGetterUseCase = get(),

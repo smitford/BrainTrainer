@@ -54,9 +54,8 @@ fun GamePreview() {
                 TopBar(
                     currentTime = "00:00",
                     gameProgress = GameProgress.IN_PROGRESS,
-                    startButtonClicked = {
-                    }) {
-                }
+                    menuIconClicked = {})
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier

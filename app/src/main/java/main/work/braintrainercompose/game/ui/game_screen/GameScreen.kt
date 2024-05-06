@@ -54,7 +54,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -170,7 +169,8 @@ fun GameScreen(
                     extraWindowStatus = ExtraWindowStatus.SETTINGS_WINDOW
                     if (gameState.value?.gamesProgress == GameProgress.IN_PROGRESS)
                         viewModel.pauseGame()
-                }
+                },
+                gameProgress = gameState.value?.gamesProgress ?: GameProgress.NOT_STARTED
             )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(if (LocalDensity.current.fontScale > 1F) 1 else 2),
@@ -179,7 +179,7 @@ fun GameScreen(
                     .fillMaxSize()
                     .imePadding()
                     .imeNestedScroll()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 6.dp)
             ) {
                 gameState.value?.expression?.let { expressionList ->
                     items(expressionList) { item ->
@@ -192,7 +192,8 @@ fun GameScreen(
                             gameIsPaused = gameState.value?.gamesProgress == GameProgress.PAUSED,
                             focusManager = focusManager
                         ) { text, id ->
-                            viewModel.addNewAnswer(id = id, answer = text)
+                            if (text.length < 5)
+                                viewModel.addNewAnswer(id = id, answer = text)
                         }
                     }
                 }
@@ -203,7 +204,7 @@ fun GameScreen(
                 ExtraWindow(extraWindowModifier) {
                     ResultsWindow(resultOfGame = gameState.value?.gameResults ?: GameResults(),
                         name = enteredName,
-                        nameChanged = { name -> enteredName = name },
+                        nameChanged = { name -> if (name.length < 16) enteredName = name },
                         saveIconClicked = {
                             if (enteredName.isEmpty()) {
                                 scope.launch {
@@ -249,18 +250,28 @@ fun GameScreen(
 @Composable
 fun TopBar(
     currentTime: String,
-    menuIconClicked: () -> Unit
+    menuIconClicked: () -> Unit,
+    gameProgress: GameProgress
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(vertical = 16.dp)
-            .padding(start = dimensionResource(id = R.dimen.padding_16)),
+            .padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         TimeTable(currentTime = currentTime)
+        when (gameProgress) {
+            GameProgress.PAUSED -> Text(
+                text = stringResource(id = R.string.pause),
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            else -> {}
+        }
+
         Icon(
             modifier = Modifier
                 .padding(end = 15.dp)
@@ -315,12 +326,12 @@ fun TableElement(
     if (showAnswer) focusManager.clearFocus()
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
-        modifier = Modifier.padding(vertical = 8.dp)
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp)
     ) {
         Text(
             text = getExpression(expression, expressionSymbol),
-            modifier = Modifier.fillMaxWidth(0.4F),
+            modifier = Modifier.fillMaxWidth(0.5F),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary
         )
@@ -364,13 +375,14 @@ fun TableElement(
         if (isWrong) AnimatedVisibility(visible = showAnswer) {
             Surface(
                 modifier = Modifier
+                    .padding(start = 12.dp)
                     .wrapContentSize(align = Alignment.Center),
                 color = MaterialTheme.colorScheme.tertiaryContainer
             ) {
                 Text(
                     text = "${expression.answer}",
                     modifier = Modifier
-                        .fillMaxSize(1F)
+                        .wrapContentSize()
                         .defaultMinSize(minWidth = 36.dp, minHeight = 22.dp)
                         .align(Alignment.CenterVertically),
                     style = MaterialTheme.typography.bodyLarge

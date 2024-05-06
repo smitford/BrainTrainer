@@ -11,7 +11,7 @@ class ThemeRepoImp(private val sharedPref: SharedPreferences) : ThemeRepo {
             .apply()
     }
 
-    override fun getThemeSettings(): Boolean =
-        sharedPref.getBoolean(THEME_SETTINGS, false)
+    override fun getThemeSettings(): Boolean? = if (sharedPref.contains(THEME_SETTINGS))
+        sharedPref.getBoolean(THEME_SETTINGS, false) else null
 
 }

@@ -4,12 +4,15 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
@@ -28,16 +31,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import main.work.braintrainercompose.R
 import main.work.braintrainercompose.game.domain.models.GameResults
 import main.work.braintrainercompose.utils.getDoubleDotsString
+import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
 
 @Composable
 fun ResultsWindow(
@@ -108,8 +114,9 @@ fun ResultsWindow(
             singleLine = true,
             onValueChange = { nameChanged(it) },
             modifier = Modifier
-                // .focusRequester(focusRequester = FocusRequester.Default)
                 .fillMaxWidth()
+                .wrapContentHeight()
+                .heightIn(min = 30.dp)
                 .padding(horizontal = 52.dp, vertical = 28.dp)
                 .background(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -122,19 +129,26 @@ fun ResultsWindow(
                     textIndent = TextIndent(firstLine = 12.sp)
                 )
             ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondaryContainer),
             decorationBox = { innerTextField ->
-                if (name.isEmpty())
-                    Text(
-                        text = stringResource(id = R.string.nick_name),
-                        style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer).merge(
-                            MaterialTheme.typography.bodySmall
-                        ),
-                        modifier = Modifier
-                            .height(30.dp)
-                            .alpha(0.5F)
-                            .padding(start = 12.dp)
-                    )
-                innerTextField.invoke()
+                Box(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .padding(start = 12.dp, top = 10.dp)
+                ) {
+                    if (name.isEmpty())
+                        Text(
+                            text = stringResource(id = R.string.nick_name),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier
+                                .alpha(0.5F)
+                                .padding(start = 12.dp),
+                        )
+                    innerTextField()
+                }
+
+
             }
         )
 
@@ -209,12 +223,12 @@ fun CloseWindowConformationDialog(
         }
     )
 }
-/*
+
 @Preview(showBackground = true)
 @Composable
 fun ResultsPreview() {
-    BrainTrainerComposeTheme {
+    BrainTrainerComposeTheme(checkShared = {})  {
         ResultsWindow(GameResults(), "", {}, {}) {
         }
     }
-}*/
+}
