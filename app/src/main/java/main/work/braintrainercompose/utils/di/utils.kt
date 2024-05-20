@@ -12,6 +12,7 @@ val utils = module {
     single { DaoAdapter() }
     single {
         Room.databaseBuilder(androidContext(), AppDataBase::class.java, "brainTrainer.db")
+            .fallbackToDestructiveMigration()
             .build()
     }
     single<DataBaseRepository> { DataBaseRepositoryImp(dataBase = get(), adapter = get()) }

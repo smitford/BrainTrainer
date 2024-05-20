@@ -1,5 +1,6 @@
 package main.work.braintrainercompose.scores.ui.score_board
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +10,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -23,17 +38,41 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import main.work.braintrainercompose.R
+import main.work.braintrainercompose.scores.domain.models.GamesHistory
 import main.work.braintrainercompose.scores.domain.models.SessionHistory
-import main.work.braintrainercompose.scores.ui.models.TableTitleElement
+import main.work.braintrainercompose.scores.ui.models.TableTitle
+import main.work.braintrainercompose.scores.ui.models.tableTabsRow
 import main.work.braintrainercompose.scores.ui.view_model.ScoreBoard
+import main.work.braintrainercompose.utils.domain.models.GameType
+import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHostController) {
     val status = viewModel.status.observeAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var tabRowState by rememberSaveable {
+        mutableStateOf(0)
+    }
+    val pagerState = rememberPagerState(
+        pageCount = {
+            3
+        },
+        initialPage = 1
+    )
+
+    LaunchedEffect(key1 = pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            tabRowState = page - 1
+        }
+    }
+
     viewModel.getHistory()
 
     Column(
@@ -57,13 +96,31 @@ fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHo
             )
         }
         if (status.value?.isEmpty == true) EmptyHistory { navHostController.popBackStack() }
-        else status.value!!.sessionHistoryList?.let { History(sessionHistoryList = it) { viewModel.clearHistory() } }
+        else {
+            TableTabRow(
+                selectedTabIndex = tabRowState,
+                modifier = Modifier,
+                changeState = { newState ->
+                    tabRowState = newState
+                    coroutineScope.launch { pagerState.scrollToPage(newState + 1) }
+                })
+            HorizontalTablePager(
+                tablePagerState = pagerState,
+                gamesHistory = status.value!!.sessionHistoryList!!,
+                clearHistory = { viewModel.clearHistory() }
+            )
+
+        }
     }
 
 }
 
 @Composable
-fun History(sessionHistoryList: List<SessionHistory>, historyEvent: () -> Unit) {
+fun History(
+    sessionHistoryList: List<SessionHistory>,
+    tableList: List<TableTitle>,
+    historyEvent: () -> Unit
+) {
     val tableHeaderModifier = Modifier
         .fillMaxWidth()
         .background(color = MaterialTheme.colorScheme.primaryContainer)
@@ -80,13 +137,17 @@ fun History(sessionHistoryList: List<SessionHistory>, historyEvent: () -> Unit) 
     ) {
         LazyColumn {
             item {
-                TableElement(tableElement = null, elementIndex = 0, modifier = tableHeaderModifier)
+                TableElement(
+                    tableElement = null,
+                    modifier = tableHeaderModifier,
+                    tableList = tableList
+                )
             }
             items(sessionHistoryList.size) { index ->
                 TableElement(
                     tableElement = sessionHistoryList[index],
-                    elementIndex = index + 1,
-                    modifier = tableElementModifier
+                    modifier = tableElementModifier,
+                    tableList = tableList
                 )
             }
         }
@@ -95,37 +156,56 @@ fun History(sessionHistoryList: List<SessionHistory>, historyEvent: () -> Unit) 
 }
 
 @Composable
-fun TableElement(tableElement: SessionHistory?, elementIndex: Int, modifier: Modifier) {
+fun TableElement(
+    tableElement: SessionHistory?,
+    modifier: Modifier,
+    tableList: List<TableTitle>
+) {
+    val isTimeNull = tableElement?.time == null
+    val tableDataList = if (isTimeNull) listOf(
+        tableElement?.userName ?: "-",
+        tableElement?.accuracy.toString(),
+        tableElement?.difficulty ?: "-",
+        tableElement?.score ?: "-"
+    ) else
+        listOf(
+            tableElement?.userName ?: "-",
+            tableElement?.accuracy.toString(),
+            tableElement?.difficulty ?: "-",
+            tableElement?.score ?: "-",
+            tableElement?.time ?: "-"
+        )
+
+
     Row(
         horizontalArrangement = Arrangement.Absolute.SpaceBetween, modifier =
-        modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+        modifier.padding(horizontal = 2.dp, vertical = 2.dp)
     ) {
-        if (tableElement == null) TableTitleElement.entries.forEach { element ->
+        if (tableElement == null) tableList.forEach { tableTitle ->
             TableElementText(
-                text = stringResource(id = element.textId),
-                modifier = Modifier.fillMaxWidth(element.weight)
+                text = stringResource(id = tableTitle.textId),
+                modifier = if (isTimeNull)
+                    Modifier.fillMaxWidth(tableTitle.weightNoTime)
+                else
+                    Modifier.fillMaxWidth(tableTitle.weightTime)
             )
         }
-        else TableTitleElement.entries.forEach { element ->
-            when (element) {
-                TableTitleElement.DIFFICULTY -> TableElementText(
-                    text = tableElement.difficulty,
-                    modifier = Modifier.fillMaxWidth(0.35f)
+        else tableList.forEachIndexed { index, tableTitle ->
+            val tableModifier =
+                if (isTimeNull)
+                    Modifier.fillMaxWidth(tableTitle.weightNoTime)
+                else
+                    Modifier.fillMaxWidth(tableTitle.weightTime)
+
+            when (index) {
+                2 -> TableElementIcon(
+                    iconId = tableDataList[index],
+                    modifier = tableModifier
                 )
 
-                TableTitleElement.NICK_NAME -> TableElementText(
-                    text = tableElement.userName,
-                    modifier = Modifier.fillMaxWidth(0.35f)
-                )
-
-                TableTitleElement.NUMBER -> TableElementText(
-                    text = elementIndex.toString(),
-                    modifier = Modifier.fillMaxWidth(0.05f)
-                )
-
-                TableTitleElement.SCORE -> TableElementText(
-                    text = tableElement.score,
-                    modifier = Modifier.fillMaxWidth(0.25f)
+                else -> TableElementText(
+                    text = tableDataList[index],
+                    modifier = tableModifier
                 )
             }
         }
@@ -140,6 +220,15 @@ fun TableElementText(text: String, modifier: Modifier) {
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.tertiary
+    )
+}
+
+@Composable
+fun TableElementIcon(iconId: String, modifier: Modifier) {
+    Icon(
+        painter = painterResource(id = iconId.toInt()),
+        contentDescription = "Difficulty lvl icon",
+        modifier = modifier.size(20.dp)
     )
 }
 
@@ -175,3 +264,128 @@ fun ButtonTemplate(textId: Int, onClickEvent: () -> Unit) {
     }
 }
 
+@Composable
+fun TableTabRow(selectedTabIndex: Int, modifier: Modifier, changeState: (Int) -> Unit) {
+    ScrollableTabRow(selectedTabIndex = selectedTabIndex, modifier = modifier.fillMaxWidth()) {
+        tableTabsRow.forEachIndexed { index, tableTabs ->
+            Tab(
+                selected = selectedTabIndex == index,
+                onClick = { changeState(index) },
+                text = { Text(text = stringResource(id = tableTabs.id)) }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun HorizontalTablePager(
+    tablePagerState: PagerState,
+    gamesHistory: GamesHistory,
+    clearHistory: () -> Unit
+) {
+    HorizontalPager(state = tablePagerState, modifier = Modifier.fillMaxWidth()) { page ->
+        when (page) {
+            1 -> {
+                val tableTitleList = listOf(
+                    TableTitle.NickName,
+                    TableTitle.Accuracy,
+                    TableTitle.Difficulty,
+                    TableTitle.Score,
+                )
+                History(
+                    sessionHistoryList = gamesHistory.freeGamesHistory,
+                    tableList = tableTitleList
+                ) { clearHistory() }
+            }
+
+            2 -> {
+                val tableTitleList = listOf(
+                    TableTitle.NickName,
+                    TableTitle.Accuracy,
+                    TableTitle.Difficulty,
+                    TableTitle.Score,
+                    TableTitle.Time
+                )
+                History(
+                    sessionHistoryList = gamesHistory.timedGamesHistory,
+                    tableList = tableTitleList
+                ) { clearHistory() }
+            }
+
+            3 -> {
+                val tableTitleList = listOf(
+                    TableTitle.NickName,
+                    TableTitle.Accuracy,
+                    TableTitle.Difficulty,
+                    TableTitle.Score,
+                    TableTitle.Time
+                )
+                History(
+                    sessionHistoryList = gamesHistory.timeRaceGamesHistory,
+                    tableList = tableTitleList
+                ) { clearHistory() }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun TableTabRowPreview() {
+    TableTabRow(0, modifier = Modifier) { n -> }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Preview(showBackground = true)
+@Composable
+fun TablePreview() {
+    val pagerState = rememberPagerState(
+        pageCount = {
+            3
+        },
+        initialPage = 1
+    )
+    val gamesHistory = GamesHistory(
+        freeGamesHistory = listOf(
+            SessionHistory(
+                id = 1,
+                userName = "Max",
+                score = "12",
+                difficulty = R.drawable.c.toString(),
+                accuracy = 100F,
+                time = null,
+                gameType = GameType.FREE_GAME
+            )
+        ),
+        timedGamesHistory = listOf(
+            SessionHistory(
+                id = 1,
+                userName = "Max",
+                score = "12",
+                difficulty = R.drawable.c.toString(),
+                accuracy = 100F,
+                time = "01:22",
+                gameType = GameType.TIME_GAME
+            )
+        ),
+        timeRaceGamesHistory = listOf(
+            SessionHistory(
+                id = 1,
+                userName = "Max",
+                score = "12",
+                difficulty = R.drawable.c.toString(),
+                accuracy = 100F,
+                time = "01:22",
+                gameType = GameType.TIME_RACE
+            )
+        )
+    )
+    BrainTrainerComposeTheme(checkShared = { /*TODO*/ }) {
+        HorizontalTablePager(
+            tablePagerState = pagerState, gamesHistory = gamesHistory
+        ) {
+        }
+    }
+
+}

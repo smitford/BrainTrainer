@@ -3,7 +3,6 @@ package main.work.braintrainercompose.game.di
 import android.app.Application
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import main.work.braintrainercompose.game.data.GameSessionAdapter
 import main.work.braintrainercompose.game.data.expression.ExpressionGeneratorRepoImpl
 import main.work.braintrainercompose.game.data.expression.GeneratorClient
 import main.work.braintrainercompose.game.data.expression.GeneratorClientImpl
@@ -72,7 +71,5 @@ val gameModule = module {
     factory<ResultsCounterUseCase> { ResultsCounterUseCaseImp(repository = get()) }
 
     factory<ResultSaverUseCase> { ResultSaverUseCaseImp(repository = get()) }
-
-    single { GameSessionAdapter() }
 
 }

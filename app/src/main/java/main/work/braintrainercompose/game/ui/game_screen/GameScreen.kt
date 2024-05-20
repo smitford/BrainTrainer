@@ -212,13 +212,11 @@ fun GameScreen(
                                 }
                             } else {
                                 viewModel.saveResults(enteredName)
-                                enteredName = ""
                                 extraWindowStatus = ExtraWindowStatus.CLOSED
                             }
                         }
                     ) {
                         viewModel.saveMode()
-                        enteredName = ""
                         extraWindowStatus = ExtraWindowStatus.CLOSED
                     }
                 }
@@ -323,7 +321,7 @@ fun TableElement(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val isWrong = expression.answer.toString() != enteredResult.filterNot { char -> char == ' ' }
-    if (showAnswer) focusManager.clearFocus()
+    if (showAnswer || gameIsPaused) focusManager.clearFocus()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,

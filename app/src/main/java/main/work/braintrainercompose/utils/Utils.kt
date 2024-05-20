@@ -182,5 +182,6 @@ class DataUtils {
         const val THEME_SETTINGS = "theme_settings"
         const val WEB_SCREEN_ROUT = "Web View"
     }
+
 }
 
