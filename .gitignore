@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+/encryption_public_key.pem
+/braine_trainer.keystore.jks
+/pepk.jar
+/app/debug/app-debug.aab
+/app/release/app-release.aab
