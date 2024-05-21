@@ -19,8 +19,16 @@ This screen containse a randomly genereted list of arithmetic expressions. User 
 
 Users can also turn on tracking of game results. If tracking is on, users will have the option to save their results after compliteing the calculations.
 
+
+https://github.com/smitford/BrainTrainer/assets/17237585/bec7e65c-f847-4e62-bb8f-2f8a39521877
+
+
 ### Results treacking
 There is accumulated information on all tracked sessions. Information is divided into tables based on the type of simulation sessions: free simulation without time tracking, time tracked, and time race.
+
+
+https://github.com/smitford/BrainTrainer/assets/17237585/4981fb42-7781-4490-9614-446bcb4ce79e
+
 
 
 ### General application settings
@@ -28,6 +36,10 @@ Screen include:
 - Dark/light theme swithcer
 - Link on privacy policy
 - Application sharing button
+
+
+
+https://github.com/smitford/BrainTrainer/assets/17237585/10c3a3d1-b665-4f40-bfb2-659f1fcfd926
 
 
 ## Technology stack
