@@ -6,7 +6,7 @@ Solve simple arithmetic expressions as quickly as possible. Choose from four typ
 Brain Trainer is my pet application started with permission to go through all the steps of developing application suitable for distribution at Google Play. At the same time, it became for me a best practice tool for improving my knowledge of Android and trends in application production. At now it is on stage on close beta testing, and if you want to join my testing team, you may contact me directly.
 Also, the last build of the application you can download [here]()
 
-## Decice requerment
+## Device requerment
 Compatible from Android 8 (Android API 26)
 
 ## App features
