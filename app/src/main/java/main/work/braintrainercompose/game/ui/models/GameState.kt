@@ -13,5 +13,5 @@ data class GameState(
     val gapsFiled: Boolean = false,
     val gamesProgress: GameProgress = GameProgress.NOT_STARTED,
     val timer: String = "00:00",
-    val gameResults: GameResults =GameResults(),
+    val gameResults: GameResults = GameResults(),
 )

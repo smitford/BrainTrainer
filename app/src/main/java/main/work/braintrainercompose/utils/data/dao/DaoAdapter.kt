@@ -31,7 +31,7 @@ class DaoAdapter {
             name = gameSession.name,
             score = gameSession.gameResults.score,
             difficulty = gameSession.difficulty,
-            accuracy = gameSession.gameResults.accuracy,
+            accuracy = gameSession.gameResults.accuracy.toString(),
             time = gameSession.gameResults.time,
             gameType = gameSession.gameType.name
         )

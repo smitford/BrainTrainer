@@ -15,11 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import main.work.braintrainercompose.scores.domain.models.SessionHistory
-import main.work.braintrainercompose.scores.ui.score_board.History
-import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
 
 @Composable
 fun ScoreBoardTest(sessionHistoryList: List<SessionHistory>) {
@@ -45,10 +42,11 @@ fun ScoreBoardTest(sessionHistoryList: List<SessionHistory>) {
             )
         }
 
-        History(sessionHistoryList = sessionHistoryList) { }
+       // History(sessionHistoryList = sessionHistoryList) { }
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun ScoreScreenPreview(
@@ -72,4 +70,4 @@ fun ScoreScreenPreview(
             )
         )
     }
-}
+}*/

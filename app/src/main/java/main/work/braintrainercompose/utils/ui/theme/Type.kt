@@ -7,37 +7,37 @@ import androidx.compose.ui.unit.sp
 
 val Typography = Typography(
     headlineLarge = TextStyle(
-        fontFamily = helvetica,
+        fontFamily = roboto,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         letterSpacing = 0.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = russo,
+        fontFamily = russ,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         letterSpacing = 0.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = helvetica,
+        fontFamily = roboto,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         letterSpacing = 0.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = helvetica,
+        fontFamily = roboto,
         fontWeight = FontWeight.Light,
         fontSize = 16.sp,
         letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = russo,
+        fontFamily = russ,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = russo,
+        fontFamily = russ,
         fontWeight = FontWeight.Bold,
         fontSize = 26.sp,
         letterSpacing = 0.sp

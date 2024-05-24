@@ -1,5 +1,6 @@
 package main.work.braintrainercompose.scores.ui.score_board
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,8 +51,10 @@ import main.work.braintrainercompose.scores.ui.models.TableTitle
 import main.work.braintrainercompose.scores.ui.models.tableTabsRow
 import main.work.braintrainercompose.scores.ui.view_model.ScoreBoard
 import main.work.braintrainercompose.utils.domain.models.GameType
+import main.work.braintrainercompose.utils.getLocal
 import main.work.braintrainercompose.utils.ui.theme.BrainTrainerComposeTheme
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -58,18 +62,18 @@ fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHo
     val status = viewModel.status.observeAsState()
     val coroutineScope = rememberCoroutineScope()
     var tabRowState by rememberSaveable {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     val pagerState = rememberPagerState(
         pageCount = {
             3
         },
-        initialPage = 1
+        initialPage = 0
     )
 
     LaunchedEffect(key1 = pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            tabRowState = page - 1
+            tabRowState = page
         }
     }
 
@@ -102,13 +106,24 @@ fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHo
                 modifier = Modifier,
                 changeState = { newState ->
                     tabRowState = newState
-                    coroutineScope.launch { pagerState.scrollToPage(newState + 1) }
+                    coroutineScope.launch { pagerState.scrollToPage(newState) }
                 })
-            HorizontalTablePager(
-                tablePagerState = pagerState,
-                gamesHistory = status.value!!.sessionHistoryList!!,
-                clearHistory = { viewModel.clearHistory() }
-            )
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 28.dp)
+            ) {
+                HorizontalTablePager(
+                    tablePagerState = pagerState,
+                    gamesHistory = status.value!!.sessionHistoryList!!,
+                )
+                ButtonTemplate(
+                    textId = R.string.clear_history,
+                    onClickEvent = { viewModel.clearHistory() }
+                )
+            }
 
         }
     }
@@ -118,8 +133,7 @@ fun ScoreBoard(viewModel: ScoreBoard = koinViewModel(), navHostController: NavHo
 @Composable
 fun History(
     sessionHistoryList: List<SessionHistory>,
-    tableList: List<TableTitle>,
-    historyEvent: () -> Unit
+    tableList: List<TableTitle>
 ) {
     val tableHeaderModifier = Modifier
         .fillMaxWidth()
@@ -128,31 +142,24 @@ fun History(
         .fillMaxWidth()
         .padding(horizontal = 6.dp)
 
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_16), vertical = 28.dp)
-    ) {
-        LazyColumn {
-            item {
-                TableElement(
-                    tableElement = null,
-                    modifier = tableHeaderModifier,
-                    tableList = tableList
-                )
-            }
-            items(sessionHistoryList.size) { index ->
-                TableElement(
-                    tableElement = sessionHistoryList[index],
-                    modifier = tableElementModifier,
-                    tableList = tableList
-                )
-            }
+
+    LazyColumn {
+        item {
+            TableElement(
+                tableElement = null,
+                modifier = tableHeaderModifier,
+                tableList = tableList
+            )
         }
-        ButtonTemplate(textId = R.string.clear_history, onClickEvent = historyEvent)
+        items(sessionHistoryList.size) { index ->
+            TableElement(
+                tableElement = sessionHistoryList[index],
+                modifier = tableElementModifier,
+                tableList = tableList
+            )
+        }
     }
+
 }
 
 @Composable
@@ -164,13 +171,13 @@ fun TableElement(
     val isTimeNull = tableElement?.time == null
     val tableDataList = if (isTimeNull) listOf(
         tableElement?.userName ?: "-",
-        tableElement?.accuracy.toString(),
+        tableElement?.accuracy ?: "-",
         tableElement?.difficulty ?: "-",
         tableElement?.score ?: "-"
     ) else
         listOf(
             tableElement?.userName ?: "-",
-            tableElement?.accuracy.toString(),
+            tableElement?.accuracy ?: "-",
             tableElement?.difficulty ?: "-",
             tableElement?.score ?: "-",
             tableElement?.time ?: "-"
@@ -178,25 +185,31 @@ fun TableElement(
 
 
     Row(
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween, modifier =
+        horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
         modifier.padding(horizontal = 2.dp, vertical = 2.dp)
     ) {
         if (tableElement == null) tableList.forEach { tableTitle ->
+            val tableModifier =
+                if (isTimeNull)
+                    Modifier
+                        .fillMaxWidth(tableTitle.weightNoTime)
+                        .heightIn(min = 36.dp)
+                else
+                    Modifier
+                        .fillMaxWidth(tableTitle.weightTime)
+                        .heightIn(min = 36.dp)
             TableElementText(
                 text = stringResource(id = tableTitle.textId),
-                modifier = if (isTimeNull)
-                    Modifier.fillMaxWidth(tableTitle.weightNoTime)
-                else
-                    Modifier.fillMaxWidth(tableTitle.weightTime)
+                modifier = tableModifier
             )
         }
         else tableList.forEachIndexed { index, tableTitle ->
-            val tableModifier =
-                if (isTimeNull)
-                    Modifier.fillMaxWidth(tableTitle.weightNoTime)
-                else
-                    Modifier.fillMaxWidth(tableTitle.weightTime)
-
+            val tableModifier = if (isTimeNull)
+                Modifier.fillMaxWidth(tableTitle.weightNoTime)
+            else
+                Modifier.fillMaxWidth(tableTitle.weightTime)
             when (index) {
                 2 -> TableElementIcon(
                     iconId = tableDataList[index],
@@ -235,7 +248,8 @@ fun TableElementIcon(iconId: String, modifier: Modifier) {
 @Composable
 fun EmptyHistory(emptyHistoryEvent: () -> Unit) {
     Column(
-        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.empty_board),
@@ -281,54 +295,77 @@ fun TableTabRow(selectedTabIndex: Int, modifier: Modifier, changeState: (Int) ->
 @Composable
 fun HorizontalTablePager(
     tablePagerState: PagerState,
-    gamesHistory: GamesHistory,
-    clearHistory: () -> Unit
+    gamesHistory: GamesHistory
 ) {
+    val local = getLocal()
     HorizontalPager(state = tablePagerState, modifier = Modifier.fillMaxWidth()) { page ->
+        val tableTitleList by rememberSaveable {
+            mutableStateOf(getList(page = page, locale = local))
+        }
+        Log.d("Local", local.country)
         when (page) {
-            1 -> {
-                val tableTitleList = listOf(
-                    TableTitle.NickName,
-                    TableTitle.Accuracy,
-                    TableTitle.Difficulty,
-                    TableTitle.Score,
-                )
+            0 -> {
                 History(
                     sessionHistoryList = gamesHistory.freeGamesHistory,
                     tableList = tableTitleList
-                ) { clearHistory() }
+                )
             }
 
-            2 -> {
-                val tableTitleList = listOf(
-                    TableTitle.NickName,
-                    TableTitle.Accuracy,
-                    TableTitle.Difficulty,
-                    TableTitle.Score,
-                    TableTitle.Time
-                )
+            1 -> {
                 History(
                     sessionHistoryList = gamesHistory.timedGamesHistory,
                     tableList = tableTitleList
-                ) { clearHistory() }
+                )
             }
 
-            3 -> {
-                val tableTitleList = listOf(
-                    TableTitle.NickName,
-                    TableTitle.Accuracy,
-                    TableTitle.Difficulty,
-                    TableTitle.Score,
-                    TableTitle.Time
-                )
+            2 -> {
                 History(
                     sessionHistoryList = gamesHistory.timeRaceGamesHistory,
                     tableList = tableTitleList
-                ) { clearHistory() }
+                )
+
             }
         }
     }
 }
+
+fun getList(page: Int, locale: Locale): List<TableTitle> =
+    if (page == 0) {
+        when (locale.country) {
+            "RU" -> listOf(
+                TableTitle.NickNameRu,
+                TableTitle.AccuracyRu,
+                TableTitle.DifficultyRu,
+                TableTitle.ScoreRu,
+            )
+
+            else ->
+                listOf(
+                    TableTitle.NickNameEng,
+                    TableTitle.AccuracyEng,
+                    TableTitle.DifficultyEng,
+                    TableTitle.ScoreEng,
+                )
+        }
+    } else {
+        when (locale.country) {
+            "RU" -> listOf(
+                TableTitle.NickNameRu,
+                TableTitle.AccuracyRu,
+                TableTitle.DifficultyRu,
+                TableTitle.ScoreRu,
+                TableTitle.TimeRu
+            )
+
+            else -> listOf(
+                TableTitle.NickNameEng,
+                TableTitle.AccuracyEng,
+                TableTitle.DifficultyEng,
+                TableTitle.ScoreEng,
+                TableTitle.TimeEng
+            )
+        }
+    }
 
 @Preview
 @Composable
@@ -337,7 +374,10 @@ fun TableTabRowPreview() {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    locale = "eng"
+)
 @Composable
 fun TablePreview() {
     val pagerState = rememberPagerState(
@@ -353,7 +393,7 @@ fun TablePreview() {
                 userName = "Max",
                 score = "12",
                 difficulty = R.drawable.c.toString(),
-                accuracy = 100F,
+                accuracy = "100",
                 time = null,
                 gameType = GameType.FREE_GAME
             )
@@ -364,7 +404,7 @@ fun TablePreview() {
                 userName = "Max",
                 score = "12",
                 difficulty = R.drawable.c.toString(),
-                accuracy = 100F,
+                accuracy = "100",
                 time = "01:22",
                 gameType = GameType.TIME_GAME
             )
@@ -373,9 +413,9 @@ fun TablePreview() {
             SessionHistory(
                 id = 1,
                 userName = "Max",
-                score = "12",
+                score = "15",
                 difficulty = R.drawable.c.toString(),
-                accuracy = 100F,
+                accuracy = "100",
                 time = "01:22",
                 gameType = GameType.TIME_RACE
             )
@@ -384,8 +424,7 @@ fun TablePreview() {
     BrainTrainerComposeTheme(checkShared = { /*TODO*/ }) {
         HorizontalTablePager(
             tablePagerState = pagerState, gamesHistory = gamesHistory
-        ) {
-        }
+        )
     }
 
 }

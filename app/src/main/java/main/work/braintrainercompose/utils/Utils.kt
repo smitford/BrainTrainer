@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.Lifecycle
@@ -117,6 +118,12 @@ fun <T> debounce(
 }
 
 @Composable
+fun getLocal(): Locale {
+    val config = LocalConfiguration.current
+    return config.locales.get(0)
+}
+
+@Composable
 fun EventListener(onEvent: (event: Lifecycle.Event) -> Unit) {
     val eventHandler = rememberUpdatedState(newValue = onEvent)
     val lifecycleOwner = rememberUpdatedState(newValue = LocalLifecycleOwner.current)
@@ -181,6 +188,10 @@ class DataUtils {
         const val SHOW_RESULTS_DELAY_MSC = 1000L
         const val THEME_SETTINGS = "theme_settings"
         const val WEB_SCREEN_ROUT = "Web View"
+        const val WEIGHT_0_25 = 0.25f
+        const val WEIGHT_0_1 = 0.1f
+        const val WEIGHT_0_2 = 0.2f
+        const val WEIGHT_0_3 = 0.3f
     }
 
 }

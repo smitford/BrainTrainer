@@ -46,7 +46,7 @@ fun GamePreview() {
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(16.dp))
             .align(Alignment.Center)
-        BrainTrainerComposeTheme {
+        BrainTrainerComposeTheme(checkShared = {}) {
             Surface(
                 Modifier
                     .fillMaxSize()

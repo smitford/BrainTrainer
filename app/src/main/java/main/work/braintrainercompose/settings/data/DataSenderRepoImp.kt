@@ -6,11 +6,16 @@ import main.work.braintrainercompose.settings.domain.api.DataSenderRepo
 
 class DataSenderRepoImp(private val context: Context) : DataSenderRepo {
     override fun sendUrl(url: String) {
-        Intent().addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, url)
-            type = "text/plain"
-            context.startActivity(this, null)
+        try {
+            Intent().addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, url)
+                type = "text/plain"
+                context.startActivity(this, null)
+            }
+        } catch (e: Exception) {
+            throw Exception("No intent")
         }
+
     }
 }

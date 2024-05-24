@@ -72,7 +72,7 @@ fun Settings(
             viewModel.saveTheme(switch)
             changeTheme(switch)
         }
-        Share(modifier = modifier) {}
+        Share(modifier = modifier) {viewModel.shareApp()}
         PrivacyPolicy(modifier = modifier) {
             navHostController.navigate(route = WEB_SCREEN_ROUT)
         }

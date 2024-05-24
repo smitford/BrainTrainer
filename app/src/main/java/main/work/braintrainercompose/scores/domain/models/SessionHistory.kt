@@ -7,7 +7,7 @@ data class SessionHistory(
     val userName: String,
     val score: String,
     val difficulty: String,
-    val accuracy: Float,
+    val accuracy: String,
     val time: String?,
     val gameType: GameType
 )

@@ -13,13 +13,13 @@ class SettingsViewModel(
     private val urlSenderUseCase: UrlSenderUseCase
 ) :
     ViewModel() {
-    private val theme = MutableLiveData<Boolean>()
+    private val theme = MutableLiveData<Boolean?>()
 
     init {
         theme.value = loadTheme()
     }
 
-    fun getTheme(): LiveData<Boolean> = theme
+    fun getTheme(): LiveData<Boolean?> = theme
 
     fun saveTheme(isDarkTheme: Boolean) {
         themeSaverUseCase.execute(isDarkTheme = isDarkTheme)
@@ -29,6 +29,6 @@ class SettingsViewModel(
     private fun loadTheme(): Boolean? = themeGetterUseCase.execute()
 
     fun shareApp() {
-        urlSenderUseCase.execute(url = "")
+        urlSenderUseCase.execute(url = "https://play.google.com/store/apps/details?id=main.work.braintrainercompose&hl=en-US&ah=sImgtVDKPHcPNvFao_Abe6AyElw")
     }
 }

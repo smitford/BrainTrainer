@@ -12,7 +12,7 @@ data class ScoresEntity(
     val score: String,
     val difficulty: String,
     @ColumnInfo(defaultValue = "100")
-    val accuracy: Float,
+    val accuracy: String,
     val time: String?,
     @ColumnInfo(defaultValue = "FREE_GAME", name = "game_type")
     val gameType: String
