@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -15,11 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -134,21 +139,40 @@ fun ResultsWindow(
                 Box(
                     modifier = Modifier
                         .height(30.dp)
-                        .padding(start = 12.dp, top = 10.dp)
+                        .padding(start = 12.dp)
                 ) {
-                    if (name.isEmpty())
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Surface(
+                            modifier = Modifier
+                                .padding(top = 10.dp)
+                        ) {
+                            innerTextField()
+                        }
+                        if (name.isNotEmpty()) {
+                            IconButton(onClick = { nameChanged("") }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clearing entered text"
+                                )
+                            }
+                        }
+                    }
+                    if (name.isEmpty()) {
                         Text(
                             text = stringResource(id = R.string.nick_name),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier
                                 .alpha(0.5F)
-                                .padding(start = 12.dp),
+                                .padding(start = 12.dp, top = 10.dp),
                         )
-                    innerTextField()
+                    }
                 }
-
-
             }
         )
 
@@ -170,7 +194,7 @@ fun ResultsWindow(
             Text(
                 text = getDoubleDotsString(
                     string1 = stringResource(id = R.string.time),
-                    string2 = resultOfGame.time
+                    string2 = resultOfGame.time ?: "00:00"
                 ),
                 style = TextStyle(MaterialTheme.colorScheme.onSecondaryContainer).merge(
                     MaterialTheme.typography.bodyMedium
@@ -227,7 +251,7 @@ fun CloseWindowConformationDialog(
 @Preview(showBackground = true)
 @Composable
 fun ResultsPreview() {
-    BrainTrainerComposeTheme(checkShared = {})  {
+    BrainTrainerComposeTheme(checkShared = {}) {
         ResultsWindow(GameResults(), "", {}, {}) {
         }
     }

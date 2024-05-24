@@ -3,12 +3,12 @@ package main.work.braintrainercompose.scores.ui.view_model
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import main.work.braintrainercompose.scores.domain.models.SessionHistory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import main.work.braintrainercompose.scores.domain.models.GamesHistory
 import main.work.braintrainercompose.scores.domain.use_case.ClearHistoryUseCase
 import main.work.braintrainercompose.scores.domain.use_case.GetHistoryUseCase
 import main.work.braintrainercompose.scores.ui.models.ScoreBoardStatus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ScoreBoard(
     val getDataUseCase: GetHistoryUseCase,
@@ -17,6 +17,7 @@ class ScoreBoard(
     val status = MutableLiveData(ScoreBoardStatus())
 
     private fun getCurrentStatus() = status.value ?: ScoreBoardStatus()
+
     // private val sessionList = listOf<SessionHistory>()
     fun getHistory() {
         viewModelScope.launch {
@@ -26,10 +27,12 @@ class ScoreBoard(
         }
     }
 
-    private fun consumeHistory(sessionsHistory: List<SessionHistory>) {
+    private fun consumeHistory(sessionsHistory: GamesHistory) {
         status.value = getCurrentStatus().copy(
             sessionHistoryList = sessionsHistory,
-            isEmpty = sessionsHistory.isEmpty()
+            isEmpty = sessionsHistory.freeGamesHistory.isEmpty() &&
+                    sessionsHistory.timedGamesHistory.isEmpty() &&
+                    sessionsHistory.timeRaceGamesHistory.isEmpty()
         )
     }
 

@@ -12,8 +12,9 @@
     <string name="hard">Трудно</string>
     <string name="impossible">Очень трудно</string>
     <string name="game_on_time">Игра на время</string>
-    <string name="count_down">Обратный отсчет</string>
+    <string name="time_race">Обратный отсчет</string>
     <string name="score_count">Подсчет очков</string>
+    <string name="free_count">Свободный режим</string>
     <string name="save">Сохранить</string>
     <string name="game_result">Результаты игры</string>
     <string name="score">Очки</string>
@@ -38,4 +39,5 @@
     <string name="warning">Внимание!</string>
     <string name="theme">Темная тема</string>
     <string name="privacy_policy">Политика конфеденциальности</string>
+    <string name="time_count">С подсчетом времени</string>
 </resources>

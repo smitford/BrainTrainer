@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import main.work.braintrainercompose.game.data.models.GameSession
-import main.work.braintrainercompose.scores.domain.models.SessionHistory
+import main.work.braintrainercompose.scores.domain.models.GamesHistory
 import main.work.braintrainercompose.utils.domain.api.DataBaseRepository
 
 
@@ -19,9 +19,28 @@ class DataBaseRepositoryImp(private val dataBase: AppDataBase, private val adapt
         dataBase.scoreDao().deleteAllSessions()
     }
 
-    override fun getSessionsHistory(): Flow<List<SessionHistory>> =
+    override fun getSessionsHistory(): Flow<GamesHistory> =
         flow {
-            val history = dataBase.scoreDao().getAllSessionsScores()
-            emit(history.map { adapter.fromScoreEntityToSessionHistory(it) })
+            val freeGameHistory = dataBase.scoreDao().getAllNotTimedHistory()
+            val timedGamesHistory = dataBase.scoreDao().getAllTimedHistory()
+            val timeRaceGamesHistory = dataBase.scoreDao().getAllTimeRacedHistory()
+            emit(GamesHistory(
+                freeGamesHistory = freeGameHistory.map {
+                    adapter.fromScoreEntityToSessionHistory(
+                        it
+                    )
+                },
+                timedGamesHistory = timedGamesHistory.map {
+                    adapter.fromScoreEntityToSessionHistory(
+                        it
+                    )
+                },
+                timeRaceGamesHistory = timeRaceGamesHistory.map {
+                    adapter.fromScoreEntityToSessionHistory(
+                        it
+                    )
+                }
+            )
+            )
         }.flowOn(Dispatchers.IO)
 }

@@ -12,8 +12,10 @@
     <string name="hard">Hard</string>
     <string name="impossible">Impossible</string>
     <string name="game_on_time">Game on time</string>
-    <string name="count_down">Count down</string>
+    <string name="time_race">Time race</string>
     <string name="score_count">Score count</string>
+    <string name="free_count">Free count</string>
+    <string name="time_count">Time count</string>
     <string name="save">Save</string>
     <string name="game_result">Game results</string>
     <string name="score">Score</string>
@@ -25,7 +27,7 @@
     <string name="clear_history">Clear history</string>
     <string name="nick_name">Nick name</string>
     <string name="level" translatable="false">lvl</string>
-    <string name="number" translatable="false">№</string>
+    <string name="accuracy" translatable="false">%</string>
     <string name="expression_type">Expression type</string>
     <string name="select_difficulty">Select difficulty</string>
     <string name="addition">Addition</string>

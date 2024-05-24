@@ -30,7 +30,9 @@ class ResultsCounterRepoImp : ResultsCounterRepo {
                 baseTime - time
             else
                 time
-        return GameResults(score = score, formatMaker(countingTime))
+        val accuracy = (rightAnswers.toFloat() / expressionAnswers.size) * 100
+
+        return GameResults(score = score, formatMaker(countingTime), accuracy = accuracy.toInt())
     }
 
     private fun scoreFormula(
@@ -43,9 +45,9 @@ class ResultsCounterRepoImp : ResultsCounterRepo {
         isTimeGame: Boolean
     ): String {
         return if (isTimeGame) {
-            round(calculationDifCoef * ((baseTime / (time / 1000)) * (rightAnswers / expressionCount) * scoreCoef)).toString()
+            round(calculationDifCoef * ((baseTime / (time / 1000)) * (rightAnswers / expressionCount) * scoreCoef)).toInt().toString()
         } else {
-            round(calculationDifCoef * REDUCTION_FACTOR * (rightAnswers / expressionCount) * scoreCoef).toString()
+            round(calculationDifCoef * REDUCTION_FACTOR * (rightAnswers / expressionCount) * scoreCoef).toInt().toString()
 
         }
     }

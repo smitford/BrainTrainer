@@ -12,6 +12,16 @@ interface ScoreDao {
     @Query("SELECT * FROM session_score ORDER BY score DESC")
     fun getAllSessionsScores(): List<ScoresEntity>
 
+    @Query("SELECT * FROM session_score WHERE game_type IS 'FREE_GAME' ORDER BY score DESC")
+    fun getAllNotTimedHistory(): List<ScoresEntity>
+
+    @Query("SELECT * FROM session_score WHERE game_type IS 'TIME_GAME' ORDER BY score DESC")
+    fun getAllTimedHistory(): List<ScoresEntity>
+
+    @Query("SELECT * FROM session_score WHERE game_type IS 'TIME_RACE' ORDER BY score DESC")
+    fun getAllTimeRacedHistory(): List<ScoresEntity>
+
+
     @Query("DELETE FROM session_score")
     fun deleteAllSessions()
 }

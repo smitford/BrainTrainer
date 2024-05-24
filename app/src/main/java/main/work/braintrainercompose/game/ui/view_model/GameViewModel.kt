@@ -22,6 +22,7 @@ import main.work.braintrainercompose.game.ui.models.GameState
 import main.work.braintrainercompose.utils.DataUtils.Companion.SHOW_RESULTS_DELAY_MSC
 import main.work.braintrainercompose.utils.DataUtils.Companion.TIMER_DELAY_MSC
 import main.work.braintrainercompose.utils.debounce
+import main.work.braintrainercompose.utils.domain.models.GameType
 
 class GameViewModel(
     private val expressionGetter: GetExpression,
@@ -172,7 +173,8 @@ class GameViewModel(
             resultSaver.execute(
                 results = gameState.value?.gameResults ?: GameResults(),
                 name = name,
-                difficulty = gameState.value?.settings?.difficulty?.name ?: " "
+                difficulty = gameState.value?.settings?.difficulty?.name ?: " ",
+                gameType = gameState.value?.settings?.getGameType() ?: GameType.FREE_GAME
             )
         }
         saveMode()
@@ -181,5 +183,6 @@ class GameViewModel(
     fun saveMode() {
         gameState.value = getCurrentStatus().copy(gamesProgress = GameProgress.SAVED)
     }
+
 
 }
